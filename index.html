@@ -219,7 +219,7 @@
       c.className='chest';
       var x=300+i*450;
       var airborne=(i%2===1);
-      var yOffset=airborne?110:0;
+      var yOffset=airborne?80:0;
       c.style.left=x+'px';
       c.style.bottom=(BASE_BOTTOM + yOffset)+'px';
       world.appendChild(c);
@@ -364,7 +364,7 @@
 
     // mode === run
     if(e.key==='ArrowUp'||k==='w'){
-      if(onGround){ vy=6.2; onGround=false; groundRock=null; }
+      if(onGround){ vy=7.4; onGround=false; groundRock=null; }
       return;
     }
     if(e.key==='ArrowDown'||k==='s'){
@@ -465,9 +465,11 @@
       if(chest.used) continue;
 
       var chestY = chest.y || 0;
-      var dinoTop = BASE_BOTTOM + y + 34;
+      var dinoBottom = BASE_BOTTOM + y;
+      var dinoTop = dinoBottom + 34;
       var chestBottom = BASE_BOTTOM + chestY;
-      var verticalHit = (chestY===0) || (dinoTop > chestBottom);
+      var chestTop = chestBottom + 22;
+      var verticalHit = (dinoTop >= chestBottom) && (dinoBottom <= chestTop);
 
       if(Math.abs(dinoX - chest.x) < 12 && verticalHit){
         chest.used=true;
