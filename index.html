@@ -1,476 +1,516 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Retro Jungle Math Quest – Tafels</title>
-  <style>
-    :root{--gb-dark:#0f380f;--gb-mid:#306230;--gb-light:#8bac0f;--gb-bg:#c4cfa1;--shell:#555;--paper:#d7dfb5;}
-    body{background:#1b1b1b;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;user-select:none;}
-    #gameboy{background:var(--gb-bg);border:10px solid var(--shell);border-radius:22px;padding:18px;width:440px;box-shadow:0 18px 40px rgba(0,0,0,.45);}
-    #screenWrap{position:relative;width:400px;height:270px;margin:0 auto;border:6px solid #3a3a3a;border-radius:12px;background:var(--gb-light);box-sizing:border-box;overflow:hidden;}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tafel Quest – Jungle Run + Obstakels + Voetbalbonus</title>
+<style>
+  body{margin:0;background:#111;display:flex;justify-content:center;align-items:center;height:100vh;font-family:monospace}
+  #gameboy{background:#ffffff12;border:10px solid #555;border-radius:20px;padding:15px;width:420px;box-shadow:0 18px 40px rgba(0,0,0,.45)}
 
-    /* Jungle */
-    #world{position:absolute;left:0;top:0;height:100%;width:10000px;
-      background:
-        radial-gradient(circle at 30px 30px, rgba(15,56,15,.18) 0 10px, transparent 11px 100%),
-        radial-gradient(circle at 120px 80px, rgba(15,56,15,.14) 0 12px, transparent 13px 100%),
-        radial-gradient(circle at 220px 40px, rgba(15,56,15,.16) 0 9px, transparent 10px 100%),
-        linear-gradient(0deg, rgba(15,56,15,.16), rgba(15,56,15,.06));
-      background-size: 280px 140px, 320px 180px, 260px 150px, auto;}
-    #canopy{position:absolute;left:0;top:0;height:45%;width:100%;background:repeating-linear-gradient(90deg, rgba(15,56,15,.18) 0 12px, rgba(15,56,15,.10) 12px 26px),linear-gradient(180deg, rgba(15,56,15,.18), transparent);opacity:.9;pointer-events:none;}
-    #vines{position:absolute;inset:0;pointer-events:none;opacity:.55;background:repeating-linear-gradient(110deg, transparent 0 90px, rgba(15,56,15,.14) 90px 92px, transparent 92px 160px);}
-    #ground{position:absolute;left:0;bottom:0;height:34%;width:100%;background:repeating-linear-gradient(90deg, rgba(15,56,15,.22) 0 10px, rgba(15,56,15,.12) 10px 22px),linear-gradient(0deg, rgba(15,56,15,.16), rgba(15,56,15,.10));border-top:3px solid rgba(15,56,15,.28);}
+  /* Vrolijke, gelaagde achtergrond (roze + blauw + geel) */
+  #screen{position:relative;width:380px;height:240px;overflow:hidden;
+    background:
+      radial-gradient(circle at 18% 22%, rgba(255,255,255,.55) 0 18px, rgba(255,255,255,0) 19px 100%),
+      radial-gradient(circle at 72% 18%, rgba(255,255,255,.45) 0 14px, rgba(255,255,255,0) 15px 100%),
+      radial-gradient(circle at 55% 35%, rgba(255,255,255,.35) 0 10px, rgba(255,255,255,0) 11px 100%),
+      linear-gradient(180deg,
+        #ff7eb3 0%,
+        #ffd86f 18%,
+        #7ad7f0 38%,
+        #a6c1ee 58%,
+        #84fab0 78%,
+        #ffeaa7 100%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,.24) 0 14px, rgba(255,255,255,0) 14px 28px);
+    border:6px solid #333;border-radius:12px;outline:none}
 
-    #runner{position:absolute;left:40px;bottom:76px;font-size:28px;text-shadow:1px 1px 0 rgba(196,207,161,.8);transform:scaleX(1);}
-    #runner.face-left{transform:scaleX(-1);}    
+  #world{position:absolute;left:0;top:0;width:4200px;height:100%;
+    background:
+      radial-gradient(160px 80px at 12% 74%, rgba(255,255,255,.12) 0 60%, rgba(0,0,0,0) 61% 100%),
+      radial-gradient(220px 100px at 40% 78%, rgba(255,255,255,.10) 0 60%, rgba(0,0,0,0) 61% 100%),
+      radial-gradient(260px 110px at 74% 80%, rgba(255,255,255,.09) 0 60%, rgba(0,0,0,0) 61% 100%),
+      linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 52%, #7be495 52%, #56c596 70%, #32936f 100%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 40px, rgba(0,0,0,0) 40px 80px);
+  }
 
-    .chest{position:absolute;bottom:76px;font-size:22px;filter:contrast(1.1);} 
-    .chest.open{opacity:.35;filter:grayscale(1);} 
+  #ground{position:absolute;bottom:0;height:60px;width:100%;background:linear-gradient(#3a5f2a,#2b4a1f);border-top:3px solid rgba(15,56,15,.28)}
 
-    /* HUD */
-    #hud{display:flex;justify-content:space-between;align-items:center;margin:10px auto 0;width:400px;color:#222;font-size:12px;gap:10px;}
-    #hud>div{white-space:nowrap;}
-    #hint{margin:10px auto 0;width:400px;font-size:12px;color:#2b2b2b;opacity:.9;line-height:1.2;}
+  /* Dino: duidelijk, kijkt naar rechts */
+  #dino{position:absolute;bottom:60px;left:40px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+    font-size:30px;line-height:1;transform:scaleX(-1);transition:transform .08s ease, bottom .06s ease;user-select:none}
+  #dino.crouch{transform:translateY(12px) scaleX(-1) scaleY(.85)}
 
-    /* Question modal */
-    #question{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(196,207,161,.65);} 
-    #qCard{width:340px;border:4px solid var(--gb-dark);border-radius:14px;background:var(--paper);padding:10px;box-shadow:0 10px 24px rgba(0,0,0,.25);color:var(--gb-dark);} 
-    #qTitle{font-weight:900;letter-spacing:1px;} 
-    #qText{margin-top:8px;white-space:pre-wrap;line-height:1.2;font-weight:900;} 
-    #answerRow{display:flex;gap:10px;margin-top:10px;align-items:center;} 
-    #answerInput{flex:1;padding:10px 10px;border:3px solid var(--gb-dark);border-radius:12px;background:var(--gb-bg);color:var(--gb-dark);font-family:inherit;font-weight:900;font-size:16px;outline:none;} 
-    #submitBtn{padding:10px 10px;border:3px solid var(--gb-dark);border-radius:12px;background:var(--gb-bg);color:var(--gb-dark);font-family:inherit;font-weight:900;cursor:pointer;box-shadow:0 4px 0 rgba(15,56,15,.4);} 
-    #submitBtn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(15,56,15,.4);} 
-    #qFooter{margin-top:8px;font-size:11px;opacity:.85;} 
+  /* Schatkist */
+  .chest{position:absolute;width:26px;height:22px;box-sizing:border-box;
+    border:3px solid #0f380f;border-radius:6px;
+    background:linear-gradient(#ffeaa7,#ffd86f);
+    box-shadow:inset 0 0 0 2px rgba(15,56,15,.12);
+  }
+  .chest:before{content:"";position:absolute;left:2px;right:2px;top:2px;height:8px;border:2px solid rgba(15,56,15,.65);border-radius:4px;background:rgba(255,255,255,.35)}
+  .chest:after{content:"";position:absolute;left:10px;top:10px;width:6px;height:6px;border:2px solid rgba(15,56,15,.75);border-radius:2px;background:rgba(255,255,255,.25)}
+  .chest.used{opacity:.35;filter:grayscale(1)}
+  .chest.used:before{transform:translateY(-6px) rotate(-8deg);transform-origin:left bottom}
 
-    /* Toast */
-    #toast{position:absolute;left:10px;right:10px;bottom:10px;padding:8px 10px;border:3px solid rgba(15,56,15,.35);border-radius:12px;background:rgba(215,223,181,.85);color:var(--gb-dark);font-weight:800;display:none;box-shadow:0 10px 20px rgba(0,0,0,.22);} 
+  /* Obstakels */
+  .rock{position:absolute;bottom:60px;width:28px;height:20px;box-sizing:border-box;
+    border:3px solid #0f380f;border-radius:12px 10px 10px 14px;
+    background:
+      radial-gradient(circle at 8px 6px, rgba(80,80,80,.95) 0 6px, rgba(60,60,60,.85) 7px 100%),
+      radial-gradient(circle at 18px 12px, rgba(70,70,70,.9) 0 5px, rgba(50,50,50,.8) 6px 100%),
+      linear-gradient(#6a6a6a,#4d4d4d);
+    box-shadow:inset -2px -2px 0 rgba(0,0,0,.18);
+  }
+  .rock:after{content:"";position:absolute;left:7px;top:4px;width:6px;height:4px;border-radius:6px;background:rgba(255,255,255,.12)}
 
-    /* Soccer bonus */
-    #soccer{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(196,207,161,.55);} 
-    #pitch{width:360px;height:235px;border:4px solid var(--gb-dark);border-radius:14px;position:relative;background:linear-gradient(0deg, rgba(15,56,15,.14), rgba(15,56,15,.07)),repeating-linear-gradient(90deg, rgba(15,56,15,.06) 0 18px, rgba(15,56,15,.02) 18px 36px);overflow:hidden;} 
-    #pitchTitle{position:absolute;left:0;right:0;top:10px;text-align:center;font-weight:900;letter-spacing:2px;color:var(--gb-dark);text-shadow:1px 1px 0 rgba(196,207,161,.9);} 
-    #goal{position:absolute;top:48px;width:70px;height:26px;border:4px solid var(--gb-dark);border-bottom:none;border-radius:10px 10px 0 0;background:rgba(196,207,161,.35);} 
-    #net{position:absolute;inset:0;background:repeating-linear-gradient(90deg, rgba(15,56,15,.12) 0 4px, transparent 4px 10px),repeating-linear-gradient(0deg, rgba(15,56,15,.12) 0 4px, transparent 4px 10px);opacity:.35;border-radius:10px 10px 0 0;} 
-    #ball{position:absolute;font-size:18px;} 
-    #shotLine{position:absolute;left:0;right:0;bottom:12px;height:0;border-top:3px dashed rgba(15,56,15,.25);} 
-    #soccerHelp{position:absolute;left:10px;right:10px;bottom:10px;font-size:11px;opacity:.9;color:var(--gb-dark);font-weight:800;} 
-  </style>
+  .tunnel{position:absolute;bottom:60px;width:92px;height:18px;box-sizing:border-box;
+    border:3px solid rgba(15,56,15,.75);border-radius:14px;
+    background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.05));
+    box-shadow:inset 0 0 0 2px rgba(15,56,15,.10);
+  }
+  .tunnel:before{content:"";position:absolute;left:4px;right:4px;top:3px;bottom:3px;border-radius:12px;border:2px dashed rgba(15,56,15,.28)}
+  .tunnel:after{content:"";position:absolute;left:6px;top:-8px;width:80px;height:10px;border:3px solid rgba(15,56,15,.35);border-bottom:none;border-radius:14px 14px 0 0;background:rgba(255,255,255,.08)}
+
+  /* Modals */
+  #question,#soccer,#end{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.40)}
+  #card{background:#ffffffcc;border:4px solid #0f380f;border-radius:12px;padding:10px;width:330px}
+  #card h3{margin:0 0 6px 0;color:#0f380f}
+  #qText{white-space:pre-wrap;line-height:1.25;color:#0f380f;font-weight:bold}
+  #answer{width:100%;padding:8px;font-size:14px;font-family:monospace;border:3px solid #0f380f;border-radius:8px;box-sizing:border-box}
+  #buttons{display:flex;gap:10px;margin-top:10px}
+  button{flex:1;padding:10px;font-weight:bold;border:3px solid #0f380f;border-radius:10px;background:#ffeaa7;cursor:pointer;color:#0f380f}
+
+  /* Soccer */
+  #pitch{width:340px;height:200px;border:4px solid #0f380f;border-radius:12px;position:relative;
+    background:linear-gradient(#84fab0,#7be495);overflow:hidden}
+  #goal{position:absolute;top:30px;width:56px;height:25px;border:4px solid #0f380f;border-bottom:none;border-radius:10px 10px 0 0;background:rgba(255,255,255,.25)}
+  #ball{position:absolute;bottom:20px;left:160px;width:18px;height:18px;border:3px solid #0f380f;border-radius:50%;background:#fff;box-sizing:border-box}
+  #soccerHelp{position:absolute;left:10px;right:10px;bottom:10px;font-size:11px;color:#0f380f;font-weight:bold;opacity:.9;text-align:center}
+
+  /* HUD */
+  #hud{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:#ddd;gap:10px}
+  #hud>div{white-space:nowrap}
+  #hint{margin-top:6px;font-size:11px;opacity:.95;color:#ddd;line-height:1.2}
+</style>
 </head>
 <body>
-  <div id="gameboy">
-    <div id="screenWrap">
-      <div id="world">
-        <div id="canopy"></div>
-        <div id="vines"></div>
-        <div id="ground"></div>
-        <div id="runner">🦖</div>
-      </div>
-
-      <div id="question" aria-hidden="true">
-        <div id="qCard">
-          <div id="qTitle">LEVEL</div>
-          <div id="qText">Vraag</div>
-          <div id="answerRow">
-            <input id="answerInput" inputmode="numeric" autocomplete="off" placeholder="antwoord" />
-            <button id="submitBtn">OK</button>
-          </div>
-          <div id="qFooter">Alleen cijfers • ENTER = OK</div>
-        </div>
-      </div>
-
-      <div id="soccer" aria-hidden="true">
-        <div id="pitch">
-          <div id="pitchTitle">LEVEL BONUS!</div>
-          <div id="goal"><div id="net"></div></div>
-          <div id="ball">⚽</div>
-          <div id="shotLine"></div>
-          <div id="soccerHelp">◀ ▶ verplaats bal • ENTER schiet</div>
-        </div>
-      </div>
-
-      <div id="toast"></div>
+<div id="gameboy">
+  <div id="screen" tabindex="0" aria-label="game">
+    <div id="world">
+      <div id="ground"></div>
+      <div id="dino" aria-label="dino">🦖</div>
     </div>
 
-    <div id="hud">
-      <div id="levelLabel">LEVEL 1/6</div>
-      <div id="tableLabel">TAFEL 5</div>
-      <div id="progressLabel">VRAAG 0/5</div>
-      <div id="scoreLabel">SCORE: 0</div>
+    <div id="question">
+      <div id="card">
+        <h3 id="qTitle"></h3>
+        <div id="qText"></div>
+        <input id="answer" inputmode="numeric" placeholder="antwoord" autocomplete="off" />
+        <div id="buttons"><button id="btnOk">OK</button></div>
+        <div style="margin-top:6px;font-size:11px;opacity:.85;color:#0f380f;">Alleen cijfers • ENTER = OK</div>
+      </div>
     </div>
 
-    <div id="hint">Controls: ◀ ▶ lopen • Loop tegen een kist 🧰 • Antwoord typen (cijfers) • ENTER</div>
+    <div id="soccer">
+      <div id="pitch">
+        <div style="position:absolute;left:0;right:0;top:8px;text-align:center;font-weight:bold;color:#0f380f">LEVEL BONUS</div>
+        <div id="goal"></div>
+        <div id="ball"></div>
+        <div id="soccerHelp">Left/Right (of A/D) • ENTER schiet</div>
+      </div>
+    </div>
+
+    <div id="end">
+      <div id="card">
+        <h3>KLAAR</h3>
+        <div id="endText" style="white-space:pre-wrap"></div>
+        <div id="buttons"><button id="btnRestart">RESTART</button></div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // ===== Levels: tafels (6 levels) =====
-    const LEVELS = [{table:5},{table:4},{table:2},{table:10},{table:7},{table:8}];
+  <div id="hud">
+    <div id="levelLbl">LEVEL 1</div>
+    <div id="qLbl">VRAAG 0/5</div>
+    <div id="scoreLbl">SCORE 0</div>
+  </div>
+  <div id="hint">Besturing: ←/→ (of A/D). Spring: ↑ (of W). Buk: ↓ (of S). Antwoord: typen + ENTER. Luchtkisten: spring ertegen.</div>
+</div>
 
-    // ===== DOM =====
-    const world = document.getElementById('world');
-    const runner = document.getElementById('runner');
+<script>
+(function(){
+  // Tafels 2..10
+  var TABLES=[2,3,4,5,6,7,8,9,10];
 
-    const question = document.getElementById('question');
-    const qTitle = document.getElementById('qTitle');
-    const qText = document.getElementById('qText');
-    const answerInput = document.getElementById('answerInput');
-    const submitBtn = document.getElementById('submitBtn');
+  // World
+  var WORLD_W=4200, VIEW_W=380;
+  var BASE_BOTTOM=60;
 
-    const soccer = document.getElementById('soccer');
-    const goal = document.getElementById('goal');
-    const ballEl = document.getElementById('ball');
+  // Game state
+  var level=0, score=0, qIndex=0;
+  var mode='run'; // run | question | soccer | end
 
-    const toast = document.getElementById('toast');
+  // Runner
+  var dinoX=40, camX=0;
+  var left=false, right=false;
+  var y=0, vy=0, onGround=true;
+  var crouch=false;
+  var groundRock=null;
 
-    const levelLabel = document.getElementById('levelLabel');
-    const tableLabel = document.getElementById('tableLabel');
-    const progressLabel = document.getElementById('progressLabel');
-    const scoreLabel = document.getElementById('scoreLabel');
+  // Entities
+  var chests=[];    // {x,y,el,used}
+  var obstacles=[]; // {x,type,el}
 
-    // ===== World constants =====
-    const VIEW_W = 400;
-    const WORLD_W = 10000;
-    const SPEED = 2.25;
+  // Soccer
+  var goalW=56;
+  var ballX=160, ballY=20;
+  var goalX=20, goalDir=1.25;
+  var shooting=false;
 
-    // ===== State =====
-    let keys = { left:false, right:false };
+  // DOM
+  var screen=document.getElementById('screen');
+  var world=document.getElementById('world');
+  var dino=document.getElementById('dino');
 
-    let paused = false;          // freezes runner movement
-    let runnerX = 40;
-    let camX = 0;
+  var question=document.getElementById('question');
+  var qTitle=document.getElementById('qTitle');
+  var qText=document.getElementById('qText');
+  var answer=document.getElementById('answer');
+  var btnOk=document.getElementById('btnOk');
 
-    let level = 0;
-    let score = 0;
+  var soccer=document.getElementById('soccer');
+  var goal=document.getElementById('goal');
+  var ball=document.getElementById('ball');
 
-    const totalQuestions = 5;    // ALWAYS 5 per level
-    let askedCount = 0;          // 0..5
-    let correctCount = 0;        // for points feedback only
+  var end=document.getElementById('end');
+  var endText=document.getElementById('endText');
+  var btnRestart=document.getElementById('btnRestart');
 
-    let chests = [];             // {x, el, used:false}
-    let currentQ = null;         // {a,b,ans}
-    let activeChestIndex = -1;   // prevents double-trigger
+  var levelLbl=document.getElementById('levelLbl');
+  var qLbl=document.getElementById('qLbl');
+  var scoreLbl=document.getElementById('scoreLbl');
 
-    // Soccer
-    let soccerActive = false;
-    let ballX = 170, ballY = 180;
-    let goalX = 30, goalV = 1.6;
-    let shooting = false;
+  var currentQ=null;
 
-    // ===== Helpers =====
-    function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
-    function toastMsg(m){
-      toast.style.display = 'block';
-      toast.textContent = m;
-      clearTimeout(toastMsg._t);
-      toastMsg._t = setTimeout(()=> toast.style.display='none', 1200);
+  function updateHUD(){
+    levelLbl.textContent='LEVEL '+(level+1)+' (TAFEL '+TABLES[level]+')';
+    qLbl.textContent='VRAAG '+qIndex+'/5';
+    scoreLbl.textContent='SCORE '+score;
+  }
+
+  function showMode(next){
+    mode=next;
+    question.style.display = (mode==='question') ? 'flex' : 'none';
+    soccer.style.display   = (mode==='soccer')   ? 'flex' : 'none';
+    end.style.display      = (mode==='end')      ? 'flex' : 'none';
+  }
+
+  function clearWorld(sel){
+    var nodes=world.querySelectorAll(sel);
+    for(var i=0;i<nodes.length;i++) nodes[i].remove();
+  }
+
+  function buildChests(){
+    chests=[];
+    clearWorld('.chest');
+    for(var i=0;i<5;i++){
+      var c=document.createElement('div');
+      c.className='chest';
+      var x=300+i*450;
+      var airborne=(i%2===1);
+      var yOffset=airborne?110:0;
+      c.style.left=x+'px';
+      c.style.bottom=(BASE_BOTTOM + yOffset)+'px';
+      world.appendChild(c);
+      chests.push({x:x,y:yOffset,el:c,used:false});
+    }
+  }
+
+  function clearObstacles(){
+    obstacles=[];
+    clearWorld('.rock, .tunnel');
+  }
+
+  function addRock(x){
+    var r=document.createElement('div');
+    r.className='rock';
+    r.style.left=x+'px';
+    world.appendChild(r);
+    obstacles.push({x:x,type:'rock',el:r});
+  }
+
+  function addTunnel(x){
+    var t=document.createElement('div');
+    t.className='tunnel';
+    t.style.left=x+'px';
+    world.appendChild(t);
+    obstacles.push({x:x,type:'tunnel',el:t});
+  }
+
+  function buildObstacles(){
+    clearObstacles();
+    for(var i=0;i<4;i++){
+      var leftChestX = 300 + i*450;
+      var x = leftChestX + 225;
+      if(i%2===0) addRock(x); else addTunnel(x);
+    }
+    addRock(300 + 4*450 + 260);
+  }
+
+  function makeQuestion(){
+    var a = Math.floor(Math.random()*10)+1;
+    var b = TABLES[level];
+    return { txt: a+' x '+b+' = ?', ans: a*b };
+  }
+
+  function resetRunner(){
+    dinoX=40; camX=0;
+    left=false; right=false;
+    y=0; vy=0; onGround=true;
+    crouch=false; groundRock=null;
+    dino.classList.remove('crouch');
+  }
+
+  function initLevel(){
+    resetRunner();
+    qIndex=0;
+    currentQ=null;
+
+    buildChests();
+    buildObstacles();
+    updateHUD();
+    showMode('run');
+  }
+
+  function openQuestion(){
+    currentQ=makeQuestion();
+    qTitle.textContent='TAFEL '+TABLES[level];
+    qText.textContent=currentQ.txt;
+    answer.value='';
+    showMode('question');
+    setTimeout(function(){ answer.focus(); }, 0);
+  }
+
+  function submitAnswer(){
+    if(!currentQ) return;
+    var val = Number(answer.value);
+    if(val === currentQ.ans) score += 5;
+    qIndex += 1;
+    currentQ=null;
+    updateHUD();
+    if(qIndex>=5) startSoccer();
+    else showMode('run');
+  }
+
+  btnOk.onclick = submitAnswer;
+  answer.addEventListener('keydown', function(e){ if(e.key==='Enter') submitAnswer(); });
+  answer.addEventListener('beforeinput', function(e){ if(e.data && /[^0-9]/.test(e.data)) e.preventDefault(); });
+
+  function startSoccer(){
+    ballX=160; ballY=20;
+    goalX=20; goalDir=1.25;
+    shooting=false;
+    ball.style.left=ballX+'px';
+    ball.style.bottom=ballY+'px';
+    goal.style.left=goalX+'px';
+    showMode('soccer');
+  }
+
+  function finishSoccer(hit){
+    if(hit) score += 10;
+    updateHUD();
+
+    level += 1;
+    if(level < TABLES.length){
+      initLevel();
+    } else {
+      endText.textContent='Eindscore: '+score+'\n\nKlik RESTART om opnieuw te spelen.';
+      showMode('end');
+    }
+  }
+
+  btnRestart.onclick = function(){ level=0; score=0; initLevel(); };
+
+  // --- Input (streamlined, always active) ---
+  function shouldIgnoreKey(e){
+    if(mode==='question') return true;
+    if(e.target === answer) return true;
+    return false;
+  }
+
+  window.addEventListener('keydown', function(e){
+    var k=(e.key||'').toLowerCase();
+
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'||e.key==='ArrowUp'||e.key==='ArrowDown') e.preventDefault();
+
+    if(shouldIgnoreKey(e)) return;
+
+    if(mode==='end'){
+      if(e.key==='Enter') btnRestart.click();
+      return;
     }
 
-    function buildProps(){
-      // Optional: add a few decorative plants (lightweight)
-      world.querySelectorAll('.prop').forEach(n => n.remove());
-      for (let i=0;i<60;i++){
-        const p = document.createElement('div');
-        p.className = 'prop';
-        p.textContent = (i%6===0) ? '🌿' : (i%6===1) ? '🌴' : (i%6===2) ? '🪴' : (i%6===3) ? '🍃' : (i%6===4) ? '🌱' : '🌳';
-        p.style.left = (randInt(0, 9800)) + 'px';
-        p.style.bottom = (randInt(78, 155)) + 'px';
-        p.style.opacity = (0.35 + Math.random()*0.45).toFixed(2);
-        p.style.fontSize = randInt(16, 22) + 'px';
-        world.appendChild(p);
+    if(mode==='soccer'){
+      if(!shooting){
+        if(e.key==='ArrowLeft'||k==='a') ballX-=10;
+        if(e.key==='ArrowRight'||k==='d') ballX+=10;
       }
-    }
-
-    function clearChests(){
-      world.querySelectorAll('.chest').forEach(n => n.remove());
-      chests = [];
-    }
-
-    function addChest(x){
-      const el = document.createElement('div');
-      el.className = 'chest';
-      el.textContent = '🧰';
-      el.style.left = x + 'px';
-      world.appendChild(el);
-      chests.push({ x, el, used:false });
-    }
-
-    function updateHUD(){
-      levelLabel.textContent = `LEVEL ${level+1}/6`;
-      tableLabel.textContent = `TAFEL ${LEVELS[level].table}`;
-      progressLabel.textContent = `VRAAG ${askedCount}/${totalQuestions}`;
-      scoreLabel.textContent = `SCORE: ${score}`;
-    }
-
-    function faceTowardNextChest(){
-      let best = null;
-      for (const c of chests){
-        if (c.used) continue;
-        const d = Math.abs(c.x - runnerX);
-        if (!best || d < best.d) best = { d, x: c.x };
+      if(e.key==='Enter' && !shooting){
+        shooting=true;
       }
-      if (!best) return;
-      if (best.x < runnerX) runner.classList.add('face-left');
-      else runner.classList.remove('face-left');
+      return;
     }
 
-    function makeQuestionForTable(t){
-      // Only 1..10
-      const a = randInt(1, 10);
-      const b = t;
-      return { a, b, ans: a*b };
+    // mode === run
+    if(e.key==='ArrowUp'||k==='w'){
+      if(onGround){ vy=6.2; onGround=false; groundRock=null; }
+      return;
+    }
+    if(e.key==='ArrowDown'||k==='s'){
+      crouch=true;
+      dino.classList.add('crouch');
+      return;
     }
 
-    // ===== Level flow =====
-    function initLevel(i){
-      level = i;
-      askedCount = 0;
-      correctCount = 0;
-      runnerX = 40;
-      camX = 0;
-      paused = false;
-      activeChestIndex = -1;
-      currentQ = null;
-      keys.left = false;
-      keys.right = false;
+    if(e.key==='ArrowLeft'||k==='a') left=true;
+    if(e.key==='ArrowRight'||k==='d') right=true;
+  }, { passive: false });
 
-      buildProps();
-      clearChests();
+  window.addEventListener('keyup', function(e){
+    var k=(e.key||'').toLowerCase();
 
-      // Place EXACTLY 5 chests (one per question)
-      for (let k=0;k<5;k++) addChest(520 + k*488 + randInt(-40, 60));
+    if(mode!=='run') return;
 
-      updateHUD();
-      toastMsg(`START: tafel van ${LEVELS[level].table}`);
+    if(e.key==='ArrowLeft'||k==='a') left=false;
+    if(e.key==='ArrowRight'||k==='d') right=false;
+    if(e.key==='ArrowDown'||k==='s'){
+      crouch=false;
+      dino.classList.remove('crouch');
+    }
+  });
+
+  // --- Core update loop ---
+  function updateRun(){
+    // horizontal intent
+    var nextX = dinoX;
+    if(left) nextX -= 2;
+    if(right) nextX += 2;
+
+    // standing on rock? walk-off detection
+    if(onGround && groundRock){
+      var stillOn = Math.abs(nextX - groundRock.x) < (12+14);
+      if(!stillOn){ onGround=false; groundRock=null; }
     }
 
-    function openQuestionForChest(idx){
-      const chest = chests[idx];
-      if (!chest || chest.used) return;
+    // gravity / jump
+    var prevY = y;
+    if(!onGround){
+      var nextY = y + vy;
+      var nextVy = vy - 0.35;
 
-      // Mark used immediately so it can't retrigger
-      chest.used = true;
-      chest.el.classList.add('open');
-      chest.el.textContent = '📦';
-
-      activeChestIndex = idx;
-      paused = true;
-
-      const t = LEVELS[level].table;
-      currentQ = makeQuestionForTable(t);
-
-      qTitle.textContent = `LEVEL ${level+1} — TAFEL ${t}`;
-      qText.textContent = `${currentQ.a} × ${currentQ.b} = ?`;
-
-      answerInput.value = '';
-      question.style.display = 'flex';
-      question.setAttribute('aria-hidden','false');
-      setTimeout(()=> answerInput.focus(), 0);
-    }
-
-    function closeQuestion(){
-      question.style.display = 'none';
-      question.setAttribute('aria-hidden','true');
-      try { answerInput.blur(); } catch(e) {}
-      currentQ = null;
-      activeChestIndex = -1;
-    }
-
-    function finishQuestion(){
-      if (!currentQ) return;
-      const raw = answerInput.value.trim();
-      if (raw === '') return toastMsg('Typ een getal.');
-
-      const correctAns = currentQ.ans;
-      const given = Number(raw);
-      const ok = Number.isFinite(given) && given === correctAns;
-
-      closeQuestion();
-
-      askedCount++;
-      if (ok) {
-        correctCount++;
-        score += 5;
-        toastMsg('✅ JUIST!');
-      } else {
-        toastMsg(`❌ FOUT (juist was ${correctAns})`);
-      }
-
-      updateHUD();
-      paused = false;
-      keys.left = false;
-      keys.right = false;
-
-      if (askedCount >= totalQuestions) {
-        setTimeout(()=> startSoccerBonus(), 450);
-      }
-    }
-
-    // Digit-only input
-    answerInput.addEventListener('beforeinput', (e) => {
-      if (e.data && /[^0-9]/.test(e.data)) e.preventDefault();
-    });
-    answerInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') finishQuestion();
-      if (e.key.length === 1 && /[^0-9]/.test(e.key)) e.preventDefault();
-    });
-    submitBtn.addEventListener('click', finishQuestion);
-
-    // ===== Soccer bonus =====
-    function startSoccerBonus(){
-      paused = true;
-      soccerActive = true;
-      shooting = false;
-
-      ballX = 170;
-      ballY = 180;
-      goalX = 30;
-      goalV = 1.6;
-
-      ballEl.style.left = ballX + 'px';
-      ballEl.style.top = ballY + 'px';
-      goal.style.left = goalX + 'px';
-
-      soccer.style.display = 'flex';
-      soccer.setAttribute('aria-hidden','false');
-      toastMsg('LEVEL BONUS: scoor met ⚽ voor +10!');
-    }
-
-    function endSoccerBonus(scored){
-      soccer.style.display = 'none';
-      soccer.setAttribute('aria-hidden','true');
-      soccerActive = false;
-      shooting = false;
-
-      if (scored) { score += 10; toastMsg('⚽ GOAL! +10'); }
-      else { toastMsg('⚽ MISS — geen bonus'); }
-      updateHUD();
-
-      setTimeout(()=>{
-        if (level < LEVELS.length - 1) {
-          initLevel(level + 1);
-        } else {
-          // End screen (reuse question modal)
-          paused = true;
-          question.style.display = 'flex';
-          question.setAttribute('aria-hidden','false');
-          qTitle.textContent = 'KLAAR!';
-          qText.textContent = `Eindscore: ${score}
-
-Druk ENTER om opnieuw te starten.`;
-          answerInput.value = '';
-          answerInput.placeholder = 'ENTER';
-          setTimeout(()=> answerInput.focus(), 0);
-          // special marker
-          activeChestIndex = -999;
+      // land on rock top while descending
+      for(var i=0;i<obstacles.length;i++){
+        var ob=obstacles[i];
+        if(ob.type!=='rock') continue;
+        var overlap = Math.abs(nextX - ob.x) < (12+14);
+        var ROCK_H = 20;
+        if(overlap && vy < 0 && prevY > ROCK_H && nextY <= ROCK_H){
+          y = ROCK_H; vy = 0; onGround = true; groundRock = ob;
+          nextY = y; nextVy = vy;
+          break;
         }
-      }, 650);
+      }
+
+      if(!onGround){
+        y = nextY; vy = nextVy;
+        if(y <= 0){ y=0; vy=0; onGround=true; groundRock=null; }
+      }
     }
 
-    function updateSoccer(){
-      if (!soccerActive) return;
+    // side collisions
+    for(var j=0;j<obstacles.length;j++){
+      var o=obstacles[j];
 
-      // Move goal left/right
-      goalX += goalV;
-      if (goalX < 10){ goalX = 10; goalV = Math.abs(goalV); }
-      if (goalX > 360 - 70 - 10){ goalX = 360 - 70 - 10; goalV = -Math.abs(goalV); }
-      goal.style.left = goalX + 'px';
-
-      if (shooting) {
-        ballY -= 3.2;
-        if (ballY <= 64) {
-          const ballCenter = ballX + 9;
-          const goalLeft = goalX;
-          const goalRight = goalX + 70;
-          const scored = (ballCenter >= goalLeft + 8 && ballCenter <= goalRight - 8);
-          endSoccerBonus(scored);
-          return;
-        }
-        if (ballY < 10) {
-          endSoccerBonus(false);
-          return;
+      if(o.type==='rock'){
+        var overlapX = Math.abs(nextX - o.x) < (12+14);
+        var ROCK_H2 = 20;
+        if(overlapX && y < (ROCK_H2 - 2)){
+          if(nextX > o.x) nextX = o.x + (12+14);
+          else nextX = o.x - (12+14);
         }
       }
 
-      ballEl.style.left = ballX + 'px';
-      ballEl.style.top = ballY + 'px';
+      if(o.type==='tunnel'){
+        var near = Math.abs(nextX - o.x) < 20;
+        if(near && !crouch){
+          if(nextX > o.x) nextX = o.x + 20;
+          else nextX = o.x - 20;
+        }
+      }
     }
 
-    function soccerMoveLeft(){ if (shooting) return; ballX = Math.max(10, ballX - 6); }
-    function soccerMoveRight(){ if (shooting) return; ballX = Math.min(360 - 20, ballX + 6); }
-    function soccerShoot(){ if (shooting) return; shooting = true; }
+    dinoX = clamp(nextX, 10, WORLD_W-40);
 
-    // ===== Input (movement always works unless modal is open) =====
-    window.addEventListener('keydown', (e) => {
-      // Soccer controls
-      if (soccerActive) {
-        if (e.key === 'ArrowLeft') soccerMoveLeft();
-        if (e.key === 'ArrowRight') soccerMoveRight();
-        if (e.key === 'Enter') soccerShoot();
-        e.preventDefault();
+    // apply transforms
+    dino.style.left = dinoX + 'px';
+    dino.style.bottom = (BASE_BOTTOM + y) + 'px';
+
+    camX = clamp(dinoX - 150, 0, WORLD_W - VIEW_W);
+    world.style.transform = 'translateX(' + (-camX) + 'px)';
+
+    // chest collisions (airborne requires jump height)
+    for(var c=0;c<chests.length;c++){
+      var chest=chests[c];
+      if(chest.used) continue;
+
+      var chestY = chest.y || 0;
+      var dinoTop = BASE_BOTTOM + y + 34;
+      var chestBottom = BASE_BOTTOM + chestY;
+      var verticalHit = (chestY===0) || (dinoTop > chestBottom);
+
+      if(Math.abs(dinoX - chest.x) < 12 && verticalHit){
+        chest.used=true;
+        chest.el.classList.add('used');
+        openQuestion();
+        break;
+      }
+    }
+  }
+
+  function updateSoccer(){
+    // clamp and move goal
+    ballX = clamp(ballX, 0, 340-18);
+    goalX += goalDir * 2;
+    if(goalX < 10 || goalX > (340-goalW-10)) goalDir *= -1;
+
+    goal.style.left = goalX + 'px';
+
+    if(shooting){
+      ballY += 6;
+      if(ballY >= 140){
+        shooting=false;
+        var hit = (ballX > goalX && ballX < goalX + goalW);
+        ballY = 20;
+        finishSoccer(hit);
         return;
       }
-
-      // End screen restart
-      if (question.style.display === 'flex' && activeChestIndex === -999) {
-        if (e.key === 'Enter') {
-          answerInput.placeholder = 'antwoord';
-          score = 0;
-          initLevel(0);
-          question.style.display = 'none';
-          paused = false;
-        }
-        return;
-      }
-
-      // If question modal open, don't move runner
-      if (question.style.display === 'flex') return;
-
-      if (e.key === 'ArrowLeft') { keys.left = true; e.preventDefault(); }
-      if (e.key === 'ArrowRight') { keys.right = true; e.preventDefault(); }
-    });
-
-    window.addEventListener('keyup', (e) => {
-      if (soccerActive) return;
-      if (question.style.display === 'flex') return;
-      if (e.key === 'ArrowLeft') { keys.left = false; e.preventDefault(); }
-      if (e.key === 'ArrowRight') { keys.right = false; e.preventDefault(); }
-    });
-
-    // ===== Game loop =====
-    function tick(){
-      if (!paused && !soccerActive && question.style.display !== 'flex') {
-        const dx = (keys.right ? SPEED : 0) - (keys.left ? SPEED : 0);
-        runnerX += dx;
-        runnerX = Math.max(10, Math.min(WORLD_W - 60, runnerX));
-
-        faceTowardNextChest();
-
-        camX = Math.max(0, runnerX - 130);
-        camX = Math.min(WORLD_W - VIEW_W, camX);
-
-        world.style.transform = `translateX(${-camX}px)`;
-        runner.style.left = runnerX + 'px';
-
-        // Collision with unused chests (each chest triggers at most once)
-        for (let i=0;i<chests.length;i++){
-          const c = chests[i];
-          if (c.used) continue;
-          if (Math.abs(runnerX - c.x) < 18) {
-            openQuestionForChest(i);
-            break;
-          }
-        }
-      }
-
-      updateSoccer();
-      requestAnimationFrame(tick);
     }
 
-    // START
-    initLevel(0);
-    requestAnimationFrame(tick);
-  </script>
+    ball.style.left = ballX + 'px';
+    ball.style.bottom = ballY + 'px';
+  }
+
+  function frame(){
+    if(mode==='run') updateRun();
+    if(mode==='soccer') updateSoccer();
+    requestAnimationFrame(frame);
+  }
+
+  // Start
+  initLevel();
+  requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
